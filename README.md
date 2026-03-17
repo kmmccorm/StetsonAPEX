@@ -1,12 +1,19 @@
 #StesonAPEX
+
 Pipeline 2: USPF/AFCO Quote Upload
+
 .NET Rewrite Requirements — Stetson Insurance
+
 1. End-to-End Flow Diagram
+
 User (UI) uploads CSV of {QuoteID → AGT_Code} pairs + selects source (USPF|AFCO)
 Step 1: Quote Intake Controller (REST API) — createOpportunities(): Resolve AGT_Code → Account, create placeholder Quotes, kick off batch processing.
+
 Step 2: Quote Enrichment Batch (Background job processor) — For each quote: call FinancePro GetQuoteByID, call FinancePro GetQuoteAgreementURL, map response → Quote fields, map policies → Policy records, build PubSub message, persist to SQL Server. On finish: write back save failures, enqueue PubSub job.
+
 Step 3: GCP Pub/Sub Publisher (Async queue job) — Authenticate to GCP via JWT, POST messages to Pub/Sub topic, batch in chunks of 1000.
-2. Step 1: Quote Intake & Placeholder Creation
+
+3. Step 1: Quote Intake & Placeholder Creation
 2.1 Functional Description
 A user submits a set of quote IDs with associated AGT (agent) codes and a lender source identifier. The system creates initial placeholder quote records in SQL Server before kicking off asynchronous enrichment.
 2.2 Detailed Behavior
